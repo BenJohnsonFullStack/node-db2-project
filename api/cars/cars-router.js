@@ -1,5 +1,11 @@
 const express = require("express");
 const Cars = require("./cars-model");
+const {
+  checkCarId,
+  checkCarPayload,
+  checkVinNumberValid,
+  checkVinNumberUnique,
+} = require("./cars-middleware");
 
 const router = express.Router();
 
@@ -12,14 +18,39 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/:id", (req, res, next) => {
-  res.json("testing get by id");
+router.get("/:id", checkCarId, (req, res, next) => {
+  try {
+    res.json(req.car);
+  } catch (err) {
+    next(err);
+  }
 });
 
-router.post("/", (req, res, next) => {
-  res.json("testing post");
-});
+router.post(
+  "/",
+  checkCarPayload,
+  checkVinNumberValid,
+  checkVinNumberUnique,
+  async (req, res, next) => {
+    try {
+      const { vin, make, model, mileage, title, transmission } = req.body;
+      const newCar = {
+        vin,
+        make,
+        model,
+        mileage,
+        title,
+        transmission,
+      };
+      const stuff = await Cars.create(newCar);
+      res.status(201).json(stuff);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
+// eslint-disable-next-line no-unused-vars
 router.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     message: err.message,
