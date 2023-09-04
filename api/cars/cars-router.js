@@ -42,8 +42,8 @@ router.post(
         title,
         transmission,
       };
-      const stuff = await Cars.create(newCar);
-      res.status(201).json(stuff);
+      const createdCar = await Cars.create(newCar);
+      res.status(201).json(createdCar);
     } catch (err) {
       next(err);
     }
