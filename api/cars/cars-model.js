@@ -16,7 +16,9 @@ const getByVin = (vin) => {
 
 const create = async (newCar) => {
   // DO YOUR MAGIC
-  return db("cars").insert(newCar);
+  const [id] = await db("cars").insert(newCar);
+  const createdCar = getById(id);
+  return createdCar;
 };
 
 module.exports = {
